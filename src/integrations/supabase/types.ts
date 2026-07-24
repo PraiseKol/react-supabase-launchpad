@@ -47,27 +47,6 @@ export type Database = {
         }
         Relationships: []
       }
-      admin_users: {
-        Row: {
-          created_at: string | null
-          email: string
-          id: string
-          password_hash: string
-        }
-        Insert: {
-          created_at?: string | null
-          email: string
-          id?: string
-          password_hash: string
-        }
-        Update: {
-          created_at?: string | null
-          email?: string
-          id?: string
-          password_hash?: string
-        }
-        Relationships: []
-      }
       bonus_awards: {
         Row: {
           bonus_type: string
@@ -1606,9 +1585,24 @@ export type Database = {
         Args: { p_game_id: string; p_points: number; p_user_id: string }
         Returns: undefined
       }
+      lose_life: {
+        Args: { p_user_id: string }
+        Returns: {
+          last_life_lost_at: string
+          lives: number
+          shielded: boolean
+        }[]
+      }
       populate_multiplayer_questions: {
         Args: { p_match_id: string }
         Returns: undefined
+      }
+      regen_lives: {
+        Args: { p_user_id: string }
+        Returns: {
+          last_life_lost_at: string
+          lives: number
+        }[]
       }
       set_week_start_date: { Args: never; Returns: string }
       trigger_competition_automation: { Args: never; Returns: undefined }
