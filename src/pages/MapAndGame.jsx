@@ -697,7 +697,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
       )}
 
       {/* Fixed Top Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 candy-gradient py-2 lg:py-3 px-3 lg:px-4 shadow-[0_4px_20px_rgba(79,156,249,0.5)] border-b-4 border-white/30">
+      <header className={`${selectedLevel ? "hidden" : ""} fixed top-0 left-0 right-0 z-50 candy-gradient py-2 lg:py-3 px-3 lg:px-4 shadow-[0_4px_20px_rgba(79,156,249,0.5)] border-b-4 border-white/30`}>
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           {/* Left: Player Name & Avatar - Clickable to Settings */}
           <button
@@ -820,7 +820,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
       )}
 
       {/* Scrollable Center (ONLY level maps scroll) */}
-      <main className="pt-20 pb-28 flex-1 overflow-y-auto">
+      <main className={selectedLevel ? "flex-1 overflow-hidden" : "pt-20 pb-28 flex-1 overflow-y-auto"}>
         {!selectedLevel ? (
           <div className="max-w-4xl mx-auto px-4 py-8">
             {[...levelPhases].reverse().map((phase, reversedIndex) => {
@@ -1049,7 +1049,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
       </main>
 
       {/* Fixed Bottom Navigation - Desktop - Single Row */}
-      <footer className="hidden lg:block fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-b from-pink-200 via-pink-300 to-pink-400 border-t-4 border-pink-500 shadow-[0_-4px_20px_rgba(236,72,153,0.4)]">
+      <footer className={`hidden ${selectedLevel ? "" : "lg:block"} fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950 border-t-4 border-amber-400 shadow-[0_-4px_24px_rgba(251,191,36,0.35)]`}>
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-center gap-3">
             {/* Settings */}
@@ -1064,7 +1064,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                 <div className="w-14 h-14 rounded-full bg-gradient-to-b from-blue-300 via-blue-400 to-blue-600 shadow-[0_4px_0_#1e40af,0_6px_10px_rgba(30,64,175,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#1e40af] transition-all hover:scale-105">
                   <span className="text-2xl">⚙️</span>
                 </div>
-                <span className="text-[10px] font-bold text-pink-900 mt-0.5 block text-center">Settings</span>
+                <span className="text-[10px] font-bold text-amber-200 mt-0.5 block text-center">Settings</span>
               </button>
             </Tooltip>
 
@@ -1080,7 +1080,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                 <div className="w-14 h-14 rounded-full bg-gradient-to-b from-green-300 via-green-400 to-green-600 shadow-[0_4px_0_#166534,0_6px_10px_rgba(22,101,52,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#166534] transition-all hover:scale-105">
                   <span className="text-2xl">🎁</span>
                 </div>
-                <span className="text-[10px] font-bold text-pink-900 mt-0.5 block text-center">Shop</span>
+                <span className="text-[10px] font-bold text-amber-200 mt-0.5 block text-center">Shop</span>
               </button>
             </Tooltip>
 
@@ -1096,7 +1096,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                 <div className="w-14 h-14 rounded-full bg-gradient-to-b from-purple-300 via-purple-400 to-purple-600 shadow-[0_4px_0_#6b21a8,0_6px_10px_rgba(107,33,168,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#6b21a8] transition-all hover:scale-105">
                   <span className="text-2xl">🎮</span>
                 </div>
-                <span className="text-[10px] font-bold text-pink-900 mt-0.5 block text-center">Multi</span>
+                <span className="text-[10px] font-bold text-amber-200 mt-0.5 block text-center">Multi</span>
               </button>
             </Tooltip>
 
@@ -1112,7 +1112,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                 <div className="w-14 h-14 rounded-full bg-gradient-to-b from-red-300 via-red-400 to-red-600 shadow-[0_4px_0_#b91c1c,0_6px_10px_rgba(185,28,28,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#b91c1c] transition-all hover:scale-105">
                   <span className="text-2xl">🏆</span>
                 </div>
-                <span className="text-[10px] font-bold text-pink-900 mt-0.5 block text-center">Compete</span>
+                <span className="text-[10px] font-bold text-amber-200 mt-0.5 block text-center">Compete</span>
               </button>
             </Tooltip>
 
@@ -1129,7 +1129,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                 <div className={`w-18 h-18 -mt-1 rounded-full bg-gradient-to-b from-yellow-300 via-yellow-400 to-yellow-600 shadow-[0_5px_0_#b45309,0_6px_12px_rgba(180,83,9,0.5)] border-3 border-white flex items-center justify-center transition-all hover:scale-110 ${challengeAllowed && !challengePlayed ? 'ring-4 ring-yellow-200/50 animate-pulse' : ''} ${!challengeAllowed ? 'opacity-50 cursor-not-allowed' : 'active:translate-y-1 active:shadow-[0_2px_0_#b45309]'}`}>
                   <span className="text-3xl">🥊</span>
                 </div>
-                <span className="text-[10px] font-bold text-pink-900 mt-0.5 block text-center">
+                <span className="text-[10px] font-bold text-amber-200 mt-0.5 block text-center">
                   {challengeAllowed && !challengePlayed ? "WEEKEND" : challengePlayed ? "Played" : "Locked"}
                 </span>
               </button>
@@ -1147,7 +1147,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                 <div className="w-14 h-14 rounded-full bg-gradient-to-b from-amber-300 via-amber-400 to-amber-600 shadow-[0_4px_0_#92400e,0_6px_10px_rgba(146,64,14,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#92400e] transition-all hover:scale-105">
                   <span className="text-2xl">🏆</span>
                 </div>
-                <span className="text-[10px] font-bold text-pink-900 mt-0.5 block text-center">Ranks</span>
+                <span className="text-[10px] font-bold text-amber-200 mt-0.5 block text-center">Ranks</span>
               </button>
             </Tooltip>
 
@@ -1163,7 +1163,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                 <div className="w-14 h-14 rounded-full bg-gradient-to-b from-pink-300 via-pink-400 to-pink-600 shadow-[0_4px_0_#be185d,0_6px_10px_rgba(190,24,93,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#be185d] transition-all hover:scale-105">
                   <span className="text-2xl">💬</span>
                 </div>
-                <span className="text-[10px] font-bold text-pink-900 mt-0.5 block text-center">Chat</span>
+                <span className="text-[10px] font-bold text-amber-200 mt-0.5 block text-center">Chat</span>
               </button>
             </Tooltip>
 
@@ -1179,7 +1179,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                 <div className="w-14 h-14 rounded-full bg-gradient-to-b from-gray-300 via-gray-400 to-gray-600 shadow-[0_4px_0_#374151,0_6px_10px_rgba(55,65,81,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#374151] transition-all hover:scale-105">
                   <span className="text-2xl">⋯</span>
                 </div>
-                <span className="text-[10px] font-bold text-pink-900 mt-0.5 block text-center">More</span>
+                <span className="text-[10px] font-bold text-amber-200 mt-0.5 block text-center">More</span>
               </button>
             </Tooltip>
           </div>
@@ -1187,7 +1187,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
       </footer>
 
       {/* Fixed Bottom Navigation - Mobile */}
-      <footer className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-b from-pink-200 via-pink-300 to-pink-400 border-t-4 border-pink-500 shadow-[0_-4px_20px_rgba(236,72,153,0.4)]">
+      <footer className={`${selectedLevel ? "hidden" : "lg:hidden"} fixed bottom-0 left-0 right-0 z-50 bg-gradient-to-b from-indigo-900 via-purple-900 to-indigo-950 border-t-4 border-amber-400 shadow-[0_-4px_24px_rgba(251,191,36,0.35)]`}>
         <div className="flex items-center justify-around px-2 py-2.5">
           {/* Settings */}
           <Tooltip content="Customize settings">
@@ -1201,7 +1201,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
               <div className="w-14 h-14 rounded-full bg-gradient-to-b from-blue-300 via-blue-400 to-blue-600 shadow-[0_4px_0_#1e40af,0_6px_10px_rgba(30,64,175,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#1e40af] transition-all">
                 <span className="text-2xl">⚙️</span>
               </div>
-              <span className="text-[10px] font-bold text-pink-900">Settings</span>
+              <span className="text-[10px] font-bold text-amber-200">Settings</span>
             </button>
           </Tooltip>
 
@@ -1217,7 +1217,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
               <div className="w-14 h-14 rounded-full bg-gradient-to-b from-green-300 via-green-400 to-green-600 shadow-[0_4px_0_#166534,0_6px_10px_rgba(22,101,52,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#166534] transition-all">
                 <span className="text-2xl">🎁</span>
               </div>
-              <span className="text-[10px] font-bold text-pink-900">Shop</span>
+              <span className="text-[10px] font-bold text-amber-200">Shop</span>
             </button>
           </Tooltip>
 
@@ -1234,7 +1234,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
               <div className={`w-16 h-16 -mt-3 rounded-full bg-gradient-to-b from-yellow-300 via-yellow-400 to-yellow-600 shadow-[0_4px_0_#b45309,0_6px_10px_rgba(180,83,9,0.4)] border-4 border-white flex items-center justify-center transition-all ${challengeAllowed && !challengePlayed ? 'ring-4 ring-yellow-200/50 animate-pulse' : ''} ${!challengeAllowed ? 'opacity-50' : 'active:translate-y-1 active:shadow-[0_2px_0_#b45309]'}`}>
                 <span className="text-3xl">🥊</span>
               </div>
-              <span className="text-[10px] font-bold text-pink-900">WEEKEND</span>
+              <span className="text-[10px] font-bold text-amber-200">WEEKEND</span>
             </button>
           </Tooltip>
 
@@ -1250,7 +1250,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
               <div className="w-12 h-12 rounded-full bg-gradient-to-b from-purple-300 via-purple-400 to-purple-600 shadow-[0_4px_0_#6b21a8,0_6px_10px_rgba(107,33,168,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#6b21a8] transition-all">
                 <span className="text-xl">🎮</span>
               </div>
-              <span className="text-[9px] font-bold text-pink-900">Multi</span>
+              <span className="text-[9px] font-bold text-amber-200">Multi</span>
             </button>
           </Tooltip>
 
@@ -1266,7 +1266,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
               <div className="w-12 h-12 rounded-full bg-gradient-to-b from-red-300 via-red-400 to-red-600 shadow-[0_4px_0_#b91c1c,0_6px_10px_rgba(185,28,28,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#b91c1c] transition-all">
                 <span className="text-xl">🏆</span>
               </div>
-              <span className="text-[9px] font-bold text-pink-900">Compete</span>
+              <span className="text-[9px] font-bold text-amber-200">Compete</span>
             </button>
           </Tooltip>
 
@@ -1282,7 +1282,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
               <div className="w-12 h-12 rounded-full bg-gradient-to-b from-gray-300 via-gray-400 to-gray-600 shadow-[0_4px_0_#374151,0_6px_10px_rgba(55,65,81,0.4)] border-2 border-white/50 flex items-center justify-center active:translate-y-1 active:shadow-[0_2px_0_#374151] transition-all">
                 <span className="text-xl">⋯</span>
               </div>
-              <span className="text-[9px] font-bold text-pink-900">More</span>
+              <span className="text-[9px] font-bold text-amber-200">More</span>
             </button>
           </Tooltip>
         </div>
