@@ -395,9 +395,18 @@ function GameScreenContent({
       
       {/* Top HUD */}
       <div className="flex-shrink-0 flex justify-between items-center px-2 py-1 bg-gradient-to-r from-pink-100/80 to-purple-100/80 backdrop-blur-md shadow-md text-[11px] sm:text-sm relative z-10">
-        <span className="chip-3d text-[11px] sm:text-sm !py-0.5 !px-2">
-          <span className="text-sm sm:text-lg">📜</span>
-          <span>Lv {level?.number}</span>
+        <span className="flex items-center gap-1.5">
+          <button
+            onClick={() => { playSound("select", effectsOn); handleBack(); }}
+            aria-label="Back to map"
+            className="btn-orb btn-orb-red w-7 h-7 sm:w-9 sm:h-9 text-xs sm:text-sm font-black"
+          >
+            <span>✕</span>
+          </button>
+          <span className="chip-3d text-[11px] sm:text-sm !py-0.5 !px-2">
+            <span className="text-sm sm:text-lg">📜</span>
+            <span>P{level?.phaseNumber} • Lv {level?.number}</span>
+          </span>
         </span>
         <span className="flex items-center gap-1.5 sm:gap-3">
           <span className="chip-3d chip-3d-star text-[11px] sm:text-sm !py-0.5 !px-2">
