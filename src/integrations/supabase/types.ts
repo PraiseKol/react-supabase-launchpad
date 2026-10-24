@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "12.2.3"
   }
   public: {
     Tables: {
@@ -193,6 +193,51 @@ export type Database = {
           },
         ]
       }
+      competition_player_rounds: {
+        Row: {
+          competition_id: string
+          created_at: string
+          group_letter: string | null
+          id: string
+          player_id: string
+          round_number: number
+          round_score: number
+        }
+        Insert: {
+          competition_id: string
+          created_at?: string
+          group_letter?: string | null
+          id?: string
+          player_id: string
+          round_number: number
+          round_score?: number
+        }
+        Update: {
+          competition_id?: string
+          created_at?: string
+          group_letter?: string | null
+          id?: string
+          player_id?: string
+          round_number?: number
+          round_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_player_rounds_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_player_rounds_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "competition_players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       competition_players: {
         Row: {
           competition_id: string
@@ -307,6 +352,7 @@ export type Database = {
           second_place_user_id: string | null
           status: Database["public"]["Enums"]["competition_status"]
           third_place_user_id: string | null
+          used_question_ids: string[]
           winner_user_id: string | null
         }
         Insert: {
@@ -322,6 +368,7 @@ export type Database = {
           second_place_user_id?: string | null
           status?: Database["public"]["Enums"]["competition_status"]
           third_place_user_id?: string | null
+          used_question_ids?: string[]
           winner_user_id?: string | null
         }
         Update: {
@@ -337,6 +384,7 @@ export type Database = {
           second_place_user_id?: string | null
           status?: Database["public"]["Enums"]["competition_status"]
           third_place_user_id?: string | null
+          used_question_ids?: string[]
           winner_user_id?: string | null
         }
         Relationships: []
@@ -1531,6 +1579,12 @@ export type Database = {
       }
     }
     Functions: {
+      add_lives: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: {
+          lives: number
+        }[]
+      }
       adjust_powerup_inventory: {
         Args: { p_amount: number; p_powerup: string; p_user_id: string }
         Returns: Json
@@ -1541,6 +1595,14 @@ export type Database = {
       }
       backup_weekly_leaderboard: { Args: never; Returns: undefined }
       calc_week_start_date: { Args: { ts: string }; Returns: string }
+      cancel_competition_admin: {
+        Args: { p_competition_id: string }
+        Returns: boolean
+      }
+      complete_competition_final: {
+        Args: { p_competition_id: string }
+        Returns: Json
+      }
       decrement_powerup: {
         Args: { p_powerup_key: string; p_user_id: string }
         Returns: undefined
@@ -1553,6 +1615,25 @@ export type Database = {
           avg_score: number
           mode: string
         }[]
+      }
+      get_competition_round_questions: {
+        Args: { p_competition_id: string; p_limit?: number }
+        Returns: {
+          answer: string
+          created_at: string | null
+          game_id: string | null
+          id: string
+          mode: string
+          options: Json | null
+          question: string
+          scripture_reference: string | null
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "multiplayer_quiz"
+          isOneToOne: false
+          isSetofReturn: true
+        }
       }
       get_daily_active_players: {
         Args: never
@@ -1597,6 +1678,20 @@ export type Database = {
         Args: { p_match_id: string }
         Returns: undefined
       }
+      process_competition_phase_transition: {
+        Args: { p_competition_id: string }
+        Returns: Json
+      }
+      record_competition_round_history: {
+        Args: { p_competition_id: string; p_round_number: number }
+        Returns: undefined
+      }
+      refill_lives: {
+        Args: { p_user_id: string }
+        Returns: {
+          lives: number
+        }[]
+      }
       regen_lives: {
         Args: { p_user_id: string }
         Returns: {
@@ -1604,6 +1699,7 @@ export type Database = {
           lives: number
         }[]
       }
+      run_competition_automation_sweep: { Args: never; Returns: undefined }
       set_week_start_date: { Args: never; Returns: string }
       trigger_competition_automation: { Args: never; Returns: undefined }
       use_invite_code: { Args: { code_input: string }; Returns: Json }
@@ -1636,12 +1732,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1665,11 +1761,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1690,11 +1786,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1715,11 +1811,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1732,11 +1828,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
