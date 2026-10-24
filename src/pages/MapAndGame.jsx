@@ -934,6 +934,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                       const isCurrentLevel = currentPhaseId === level.id;
                       const isPreviousCompleted = idx === 0 || completedLevels.includes(wrappedLevels[idx - 1].id);
                       const isLevelUnlocked = isUnlocked && isPreviousCompleted;
+                      const isPhaseEnd = idx === wrappedLevels.length - 1;
                       const score = levelScores[level.id] || 0;
                       const stars = getStarsFromScore(score);
 
@@ -963,6 +964,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
 
                           {/* Level Node Button - Responsive with Light Bulb */}
                           <button
+                            aria-label={`${isLevelUnlocked ? (isCompleted ? "Replay" : "Play") : "Locked"} phase ${level.phaseNumber}, level ${level.number}${isPhaseEnd ? ", phase treasure chest" : ""}; ${stars} of 3 stars`}
                             onClick={() => {
                               if (gameUser.lives === 0) {
                                 playSound("error", effectsOn);
@@ -988,40 +990,53 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                               ${shakingLevel === level.id ? 'animate-wiggle' : ''}
                             `}
                           >
-                            {isLevelUnlocked ? (
-                              <div className="relative flex items-center justify-center">
-                                <svg
-                                  className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10 text-yellow-200 drop-shadow-[0_2px_2px_rgba(0,0,0,0.35)]"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                >
-                                  <path d="M12 2C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2 14h-4v-1h4v1zm0-2h-4v-1h4v1zm.85-3.5c-.26.21-.35.28-.85.5v1.5h-4v-1.5c-.5-.22-.59-.29-.85-.5C8.47 10.72 8 9.89 8 9c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .89-.47 1.72-1.15 2.5z"/>
-                                </svg>
-                                <span className="absolute text-[9px] sm:text-[11px] lg:text-xs font-black text-amber-900 drop-shadow-[0_1px_0_rgba(255,255,255,0.6)]">
-                                  {level.number}
-                                </span>
-                              </div>
-                            ) : (
-                              <Lock className="text-gray-300 w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 drop-shadow-[0_2px_2px_rgba(0,0,0,0.4)]" />
+                            <span className="text-base sm:text-xl lg:text-2xl leading-none font-black text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.65)]">
+                              {level.number}
+                            </span>
+                            {!isLevelUnlocked && (
+                              <span className="absolute -top-1 -left-1 flex h-4 w-4 items-center justify-center rounded-full border border-white/80 bg-gray-700 shadow-md sm:h-5 sm:w-5">
+                                <Lock className="h-2.5 w-2.5 text-white sm:h-3 sm:w-3" />
+                              </span>
                             )}
                           </button>
 
 
-                          {/* Stars Display for Completed Levels */}
-                          {isCompleted && (
-                            <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 flex gap-0.5">
-                              {[...Array(3)].map((_, starIdx) => (
-                                <Star
-                                  key={starIdx}
-                                  className={`w-3.5 h-3.5 ${
-                                    starIdx < stars 
-                                      ? 'text-yellow-400 fill-yellow-400' 
-                                      : 'text-gray-500 fill-gray-500'
-                                  }`}
-                                />
-                              ))}
-                            </div>
+                          {isPhaseEnd && (
+                            <span
+                              aria-hidden="true"
+                              className="btn-orb btn-orb-yellow absolute -right-2 -top-2 z-20 h-6 w-6 border-2"
+                            >
+                              <svg
+                                className="h-3.5 w-3.5 text-amber-950 drop-shadow-sm"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2.2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" />
+                                <path d="m4 10 2-5h12l2 5M3 10h18M12 5v5m-2 4h4" />
+                              </svg>
+                            </span>
                           )}
+
+                          {/* Stars Display for Completed Levels */}
+                          <div
+                            aria-hidden="true"
+                            className="absolute -bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-white/30 bg-black/40 px-1 py-0.5 shadow-sm"
+                          >
+                            {[...Array(3)].map((_, starIdx) => (
+                              <Star
+                                key={starIdx}
+                                className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${
+                                  starIdx < stars
+                                    ? 'text-yellow-400 fill-yellow-400'
+                                    : 'text-gray-400 fill-gray-500/70'
+                                }`}
+                              />
+                            ))}
+                          </div>
                         </div>
                       );
                     })}
