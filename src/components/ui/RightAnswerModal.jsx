@@ -39,7 +39,20 @@ export default function RightAnswerModal({
             <div className="absolute bottom-2 left-4 text-xl animate-bounce animation-delay-500">💫</div>
             <div className="absolute bottom-2 right-4 text-xl animate-bounce animation-delay-700">🌟</div>
             
-            <div className="text-5xl sm:text-6xl animate-bounce mb-2">🏆</div>
+            <div className="flex justify-center items-end gap-1 mb-2">
+              {[0, 1, 2].map((i) => {
+                const earned = i < (score >= 100 ? 3 : score >= 75 ? 2 : score >= 50 ? 1 : 0);
+                return (
+                  <span
+                    key={i}
+                    className={`inline-block opacity-0 animate-scale-in ${i === 1 ? "text-6xl sm:text-7xl -translate-y-2" : "text-4xl sm:text-5xl"} ${earned ? "drop-shadow-[0_4px_8px_rgba(234,179,8,0.7)]" : "grayscale opacity-40"}`}
+                    style={{ animationDelay: `${150 + i * 250}ms`, animationFillMode: "forwards" }}
+                  >
+                    ⭐
+                  </span>
+                );
+              })}
+            </div>
             
             <Dialog.Title className="text-2xl sm:text-3xl font-black text-transparent bg-gradient-to-r from-green-500 to-emerald-600 bg-clip-text drop-shadow-lg">
               Correct!
