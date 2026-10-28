@@ -1014,7 +1014,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                             </span>
                           )}
 
-                          {/* Stars Display for Completed Levels */}
+                          {/* Star slots show earned progress and open goals. */}
                           <div
                             aria-hidden="true"
                             className="absolute -bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-white/30 bg-black/40 px-1 py-0.5 shadow-sm"
@@ -1025,7 +1025,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                                 className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${
                                   starIdx < stars
                                     ? 'text-yellow-400 fill-yellow-400'
-                                    : 'text-gray-400 fill-gray-500/70'
+                                    : 'text-gray-300 fill-none'
                                 }`}
                               />
                             ))}
