@@ -17,6 +17,13 @@ export const determineUnlockedPhases = (completedIds, levelPhases) => {
       completed: completedIds.includes(level.id),
       phaseNumber: levelPhases[phaseIndex].phaseNumber,
     }));
+
+export const getStarsFromScore = (score = 0) => {
+  if (score >= 100) return 3;
+  if (score >= 75) return 2;
+  if (score >= 50) return 1;
+  return 0;
+};
   
 export const getPowerUpIcon = (key) => {
   switch (key) {

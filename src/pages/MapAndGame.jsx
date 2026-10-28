@@ -39,6 +39,7 @@ import { checkAndGrantAchievements } from "@/lib/achievements";
 import {
   determineUnlockedPhases,
   wrapLevelsWithStatus,
+  getStarsFromScore,
   getPowerUpIcon,
   getPowerUpTooltip,
 } from "@/utils/gameHelpers";
@@ -148,14 +149,6 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
     });
     return maxPhase;
   }, [completedLevels]);
-
-  // Helper: Convert score to stars (0, 50, 75, 100 → 0, 1, 2, 3 stars)
-  const getStarsFromScore = (score) => {
-    if (score >= 100) return 3;
-    if (score >= 75) return 2;
-    if (score >= 50) return 1;
-    return 0;
-  };
 
   // Helper: Shake animation for locked levels
   const handleLockedClick = (levelId) => {
@@ -986,7 +979,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                               flex items-center justify-center
                               ${!isLevelUnlocked ? 'is-locked' : ''}
                               ${isCompleted ? 'is-completed' : ''}
-                              ${isCurrentLevel ? 'is-current ring-4 ring-yellow-300/80' : ''}
+                              ${isCurrentLevel ? 'is-current glow-ring ring-4 ring-yellow-300/80' : ''}
                               ${shakingLevel === level.id ? 'animate-wiggle' : ''}
                             `}
                           >
