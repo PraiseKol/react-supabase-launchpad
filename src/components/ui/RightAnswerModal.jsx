@@ -10,12 +10,18 @@ export default function RightAnswerModal({
   score,
   effectsOn
 }) {
-  // Play modal open sound
+  const earnedStars = score >= 100 ? 3 : score >= 75 ? 2 : score >= 50 ? 1 : 0;
+
+  // Let each earned star land with its own short celebratory cue.
   useEffect(() => {
-    if (isOpen) {
-      playSound("levelUp", effectsOn);
-    }
-  }, [isOpen, effectsOn]);
+    if (!isOpen || earnedStars === 0) return undefined;
+
+    const timers = Array.from({ length: earnedStars }, (_, index) =>
+      window.setTimeout(() => playSound("starEarned", effectsOn), 250 + index * 380)
+    );
+
+    return () => timers.forEach(window.clearTimeout);
+  }, [isOpen, earnedStars, effectsOn]);
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog onClose={onClose} className="relative z-10">
@@ -41,7 +47,7 @@ export default function RightAnswerModal({
             
             <div className="flex justify-center items-end gap-1 mb-2">
               {[0, 1, 2].map((i) => {
-                const earned = i < (score >= 100 ? 3 : score >= 75 ? 2 : score >= 50 ? 1 : 0);
+                const earned = i < earnedStars;
                 return (
                   <span
                     key={i}

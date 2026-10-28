@@ -39,6 +39,7 @@ import { checkAndGrantAchievements } from "@/lib/achievements";
 import {
   determineUnlockedPhases,
   wrapLevelsWithStatus,
+  getStarsFromScore,
   getPowerUpIcon,
   getPowerUpTooltip,
 } from "@/utils/gameHelpers";
@@ -148,14 +149,6 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
     });
     return maxPhase;
   }, [completedLevels]);
-
-  // Helper: Convert score to stars (0, 50, 75, 100 → 0, 1, 2, 3 stars)
-  const getStarsFromScore = (score) => {
-    if (score >= 100) return 3;
-    if (score >= 75) return 2;
-    if (score >= 50) return 1;
-    return 0;
-  };
 
   // Helper: Shake animation for locked levels
   const handleLockedClick = (levelId) => {
@@ -986,7 +979,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                               flex items-center justify-center
                               ${!isLevelUnlocked ? 'is-locked' : ''}
                               ${isCompleted ? 'is-completed' : ''}
-                              ${isCurrentLevel ? 'is-current ring-4 ring-yellow-300/80' : ''}
+                              ${isCurrentLevel ? 'is-current glow-ring ring-4 ring-yellow-300/80' : ''}
                               ${shakingLevel === level.id ? 'animate-wiggle' : ''}
                             `}
                           >
@@ -1021,7 +1014,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                             </span>
                           )}
 
-                          {/* Stars Display for Completed Levels */}
+                          {/* Star slots show earned progress and open goals. */}
                           <div
                             aria-hidden="true"
                             className="absolute -bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-white/30 bg-black/40 px-1 py-0.5 shadow-sm"
@@ -1032,7 +1025,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
                                 className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${
                                   starIdx < stars
                                     ? 'text-yellow-400 fill-yellow-400'
-                                    : 'text-gray-400 fill-gray-500/70'
+                                    : 'text-gray-300 fill-none'
                                 }`}
                               />
                             ))}
