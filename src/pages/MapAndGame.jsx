@@ -380,7 +380,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
     safelyNavigatingRef.current = true;
 
     setSelectedLevel(null);
-    const currentLevelId = gameUser.current_level_id;
+    const currentLevelId = gameUser?.current_level_id;
     const currentLevelEl = levelRefs.current[currentLevelId];
     if (currentLevelEl) {
       setTimeout(() => {
@@ -642,6 +642,18 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
             Preparing your spiritual journey...
           </p>
         </div>
+      </div>
+    );
+  }
+
+  if (!gameUser) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-950 p-6 text-center">
+        <p className="text-lg font-bold text-amber-100">We couldn't set up your player profile.</p>
+        <p className="text-sm text-purple-200">Check your connection and try again.</p>
+        <button onClick={() => refetch()} className="btn-orb btn-orb-yellow px-6 py-3 font-black text-amber-950">
+          Try again
+        </button>
       </div>
     );
   }
