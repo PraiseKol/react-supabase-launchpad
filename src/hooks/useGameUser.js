@@ -14,42 +14,52 @@ export function useGameUser(userId) {
     } 
     
     try { 
-      const { data, error, status } = await supabase 
-      .from('game_users') 
-      .select('*') 
-      .eq('user_id', userId) 
-      .single(); 
-      
-      let userData = data; 
-      
-      if (error && status === 406) { 
-        console.log("🆕 Creating new game_user record..."); 
+      const { data, error } = await supabase
+        .from('game_users')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
 
-        const { data: newUser, error: insertError } = await supabase 
-        .from('game_users') 
-        .insert({ 
-          user_id: userId, 
-          lives: 5, 
-          last_life_lost_at: null, 
-          player_name: null, 
-          talents: 20, // Default starting talents 
-          powerups_inventory: {}, // Default empty power-up inventory 
-        }) 
-        .select() 
-        .single(); 
-        
-        if (insertError) { 
-          console.error("❌ Failed to create game user:", insertError); 
-          setLoading(false); 
-          return; 
-        } 
-        
-        userData = newUser; 
-      } else if (error) { 
-        console.error("❌ Error fetching game user:", error); 
-        setLoading(false); 
-        return; 
-      } 
+      if (error) {
+        console.error("❌ Error fetching game user:", error);
+        setLoading(false);
+        return;
+      }
+
+      let userData = data;
+
+      if (!userData) {
+        console.log("🆕 Creating new game_user record...");
+        const { data: newUser, error: insertError } = await supabase
+          .from('game_users')
+          .insert({
+            user_id: userId,
+            lives: 5,
+            last_life_lost_at: null,
+            player_name: null,
+            talents: 20,
+            powerups_inventory: {},
+          })
+          .select()
+          .maybeSingle();
+
+        if (insertError || !newUser) {
+          // A parallel insert may have won the race; re-read once.
+          const { data: retry } = await supabase
+            .from('game_users')
+            .select('*')
+            .eq('user_id', userId)
+            .maybeSingle();
+          if (!retry) {
+            console.error("❌ Failed to create game user:", insertError);
+            setLoading(false);
+            return;
+          }
+          userData = retry;
+        } else {
+          userData = newUser;
+        }
+      }
       
       // 🧠 Recalculate lives using time logic 
       const { lives, last_life_lost_at } = userData; 
