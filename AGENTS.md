@@ -1,0 +1,2 @@
+# Architecture rules
+- Keep phase-map rendering and phase paging in a dedicated `ThemedWorldMap` component while `MapAndGame` owns progress and game transitions, so map redesigns do not duplicate gameplay logic.
