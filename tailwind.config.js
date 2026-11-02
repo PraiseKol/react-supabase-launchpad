@@ -21,6 +21,12 @@ module.exports = {
         christmasRed: '#DC2626',
         christmasGreen: '#16A34A',
         christmasGold: '#FBBF24',
+        world: {
+          ink: 'hsl(var(--world-ink) / <alpha-value>)',
+          gold: 'hsl(var(--world-gold) / <alpha-value>)',
+          cream: 'hsl(var(--world-cream) / <alpha-value>)',
+          route: 'hsl(var(--world-route) / <alpha-value>)',
+        },
       },
       animation: {
         gradientBlur: 'gradientBlur 8s ease-in-out infinite',

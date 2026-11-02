@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --world-ink: 202 47% 17%;
+  --world-gold: 43 92% 56%;
+  --world-cream: 47 100% 94%;
+  --world-route: 44 100% 80%;
+}
+
 /* ============================================================
    3D GAME PRIMITIVES — reusable Candy Crush / Royal Match style
    ============================================================ */
@@ -444,6 +451,48 @@
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+@layer components {
+  .world-map-scene {
+    isolation: isolate;
+  }
+
+  .world-map-scene::after {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    content: "";
+    pointer-events: none;
+    background: linear-gradient(180deg, hsl(var(--world-ink) / 0.45), transparent 30%, transparent 62%, hsl(var(--world-ink) / 0.48));
+  }
+
+  .world-map-image {
+    animation: world-reveal 420ms ease-out both;
+  }
+
+  .world-map-route {
+    fill: none;
+    stroke: hsl(var(--world-route) / 0.9);
+    stroke-width: 1.45;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 2.2 2.5;
+    filter: drop-shadow(0 1px 1px hsl(var(--world-ink) / 0.8));
+  }
+
+  .world-map-route-complete {
+    fill: none;
+    stroke: hsl(var(--world-gold));
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    filter: drop-shadow(0 1px 2px hsl(var(--world-ink) / 0.8));
+  }
+}
+
+@keyframes world-reveal {
+  from { opacity: 0.65; transform: scale(1.025); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* A11y: visible focus ring on interactive elements */
