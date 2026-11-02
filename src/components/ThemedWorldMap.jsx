@@ -45,7 +45,12 @@ export default function ThemedWorldMap({
 }) {
   const swipeStartX = useRef(null);
   const world = worlds[phaseIndex % worlds.length];
-  const wrappedLevels = wrapLevelsWithStatus(phaseIndex, phase, completedLevels, [phase]);
+  const wrappedLevels = phase.levels.map((level, index) => ({
+    ...level,
+    number: index + 1,
+    completed: completedLevels.includes(level.id),
+    phaseNumber: phase.phaseNumber,
+  }));
   const phaseCompleted = wrappedLevels.filter((level) => completedLevels.includes(level.id)).length;
   const phaseProgress = Math.round((phaseCompleted / Math.max(wrappedLevels.length, 1)) * 100);
   const overallProgress = Math.round((totalCompleted / Math.max(totalLevels, 1)) * 100);
