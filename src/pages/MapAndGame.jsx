@@ -533,6 +533,12 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
     }
   };
 
+  const changeMapPhase = (nextIndex) => {
+    if (nextIndex < 0 || nextIndex >= levelPhases.length) return;
+    playSound("optionSelect", effectsOn);
+    setSelectedPhaseIndex(nextIndex);
+  };
+
   const handleNextPhaseScroll = () => {
     // Always close modal first
     setShowScriptureModal(false);
