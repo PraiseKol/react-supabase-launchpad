@@ -14,7 +14,7 @@ import { useGameUser } from "@/hooks/useGameUser";
 import { LivesDisplay } from "@/components/LivesDisplay";
 import MapBackground from "@/components/MapBackground";
 import GameScreen from "@/components/GameScreen";
-import { Lock, Star } from "lucide-react";
+import ThemedWorldMap from "@/components/ThemedWorldMap";
 import AppToaster from "@/components/ui/toaster";
 import ScriptureModal from "@/components/ScriptureModal";
 import SettingsModal from "@/components/SettingsModal";
@@ -62,6 +62,7 @@ const AVATARS = [
 
 export default function MapAndGame({ sound, setSound, effectsOn }) {
   const [selectedLevel, setSelectedLevel] = useState(null);
+  const [selectedPhaseIndex, setSelectedPhaseIndex] = useState(0);
   const safelyNavigatingRef = useRef(false);
   const [unlockedPhases, setUnlockedPhases] = useState([]);
   const [showUnlockAnimation, setShowUnlockAnimation] = useState(false);
@@ -162,7 +163,6 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
     return AVATARS.find(a => a.id === avatarId)?.emoji || '🕊️';
   };
 
-  const phaseRefs = useRef([]);
   const levelRefs = useRef({});
   const [showNextLevelModal, setShowNextLevelModal] = useState(false);
 
@@ -320,34 +320,14 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
     setUnlockedPhases(unlocked);
   }, [completedLevels]);
 
-  // 🌟 Auto-scroll to current level (first incomplete level)
+  // Open the world containing the player's next incomplete level.
   useEffect(() => {
     if (!selectedLevel && completedLevels !== undefined && !progressLoading) {
-      const scrollToCurrentLevel = () => {
-        // Find the first incomplete level across all phases
-        for (const phase of levelPhases) {
-          for (const level of phase.levels) {
-            if (!completedLevels.includes(level.id)) {
-              const levelEl = levelRefs.current[level.id];
-              if (levelEl) {
-                levelEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return;
-              }
-            }
-          }
-        }
-        // If all levels complete, scroll to highest phase
-        const highestIndex = Math.max(...(unlockedPhases.length > 0 ? unlockedPhases : [0]));
-        if (phaseRefs.current[highestIndex]) {
-          phaseRefs.current[highestIndex]?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        }
-      };
-      
-      // Delay to ensure refs are populated
-      setTimeout(scrollToCurrentLevel, 300);
+      const firstIncompletePhaseIndex = levelPhases.findIndex((phase) =>
+        phase.levels.some((level) => !completedLevels.includes(level.id))
+      );
+      const lastUnlockedIndex = Math.max(...(unlockedPhases.length > 0 ? unlockedPhases : [0]));
+      setSelectedPhaseIndex(firstIncompletePhaseIndex === -1 ? lastUnlockedIndex : firstIncompletePhaseIndex);
     }
   }, [completedLevels, progressLoading, selectedLevel, levelPhases, unlockedPhases]);
 
@@ -379,18 +359,10 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
     // ✅ Mark as safe navigation so we don't penalize intentional exits
     safelyNavigatingRef.current = true;
 
+    const currentLevelId = gameUser?.current_level_id || selectedLevel?.id;
+    const phaseMatch = currentLevelId?.match(/^P(\d+)-L\d+$/);
+    if (phaseMatch) setSelectedPhaseIndex(Math.max(0, Number(phaseMatch[1]) - 1));
     setSelectedLevel(null);
-    const currentLevelId = gameUser?.current_level_id;
-    const currentLevelEl = levelRefs.current[currentLevelId];
-    if (currentLevelEl) {
-      setTimeout(() => {
-        currentLevelEl.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-          inline: "center",
-        });
-      }, 100);
-    }
 
     // 🔄 Clear the flag shortly after navigation completes
     setTimeout(() => {
@@ -580,14 +552,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
       (p) => p.phaseNumber === currentPhaseNum + 1
     );
 
-    if (nextIndex !== -1 && phaseRefs.current[nextIndex]) {
-      setTimeout(() => {
-        phaseRefs.current[nextIndex].scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
-      }, 300);
-    }
+    if (nextIndex !== -1) setSelectedPhaseIndex(nextIndex);
   };
 
   const handleSavePlayerName = async () => {
