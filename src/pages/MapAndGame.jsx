@@ -39,7 +39,6 @@ import { checkAndGrantAchievements } from "@/lib/achievements";
 import {
   determineUnlockedPhases,
   getCurrentPhaseIndex,
-  getStarsFromScore,
   getPowerUpIcon,
   getPowerUpTooltip,
 } from "@/utils/gameHelpers";
@@ -549,7 +548,9 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
 
     // Use the highest unlocked phase instead of selectedLevel
     const currentPhaseNum =
-      selectedLevel?.phaseNumber ?? Math.max(...unlockedPhases, 0);
+      selectedLevel?.phaseNumber ??
+      levelPhases[selectedPhaseIndex]?.phaseNumber ??
+      Math.max(...unlockedPhases, 0);
     const nextIndex = levelPhases.findIndex(
       (p) => p.phaseNumber === currentPhaseNum + 1
     );
