@@ -38,7 +38,6 @@ import { updateQuestProgress } from "@/lib/quests";
 import { checkAndGrantAchievements } from "@/lib/achievements";
 import {
   determineUnlockedPhases,
-  wrapLevelsWithStatus,
   getStarsFromScore,
   getPowerUpIcon,
   getPowerUpTooltip,
@@ -768,259 +767,38 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
         </div>
       </header>
 
-      {/* Mini-Map Progress Indicator */}
-      {!selectedLevel && (
-        <div className="fixed top-24 right-2 sm:right-4 z-40 bg-white/90 backdrop-blur rounded-xl shadow-xl p-1.5 sm:p-2 w-14 sm:w-16 border-2 border-blue-200">
-          <div className="text-center text-[9px] sm:text-xs font-bold text-gray-700 mb-1">Progress</div>
-          <div className="relative h-24 sm:h-32 bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className="absolute bottom-0 w-full bg-gradient-to-t from-yellow-400 to-yellow-300 transition-all duration-500"
-              style={{ height: `${Math.min(100, (completedLevels.length / (levelPhases.length * 10)) * 100)}%` }}
-            />
-            {/* Current phase marker */}
-            <div 
-              className="absolute left-1/2 -translate-x-1/2 w-2 sm:w-3 h-2 sm:h-3 bg-blue-500 rounded-full border-2 border-white shadow-lg"
-              style={{ 
-                bottom: `${Math.min(100, ((highestCompletedPhase) / levelPhases.length) * 100)}%`,
-                transition: 'bottom 0.5s ease'
-              }}
-            />
-          </div>
-          <div className="text-center text-[9px] sm:text-[10px] font-bold text-gray-600 mt-1">
-            Phase {Math.max(1, highestCompletedPhase)}
-          </div>
-          <div className="text-center text-[8px] sm:text-[9px] text-gray-500">
-            {Math.round((completedLevels.length / (levelPhases.length * 10)) * 100)}%
-          </div>
-        </div>
-      )}
-
-      {/* Scrollable Center (ONLY level maps scroll) */}
-      <main className={selectedLevel ? "flex-1 overflow-hidden" : "pt-20 pb-28 flex-1 overflow-y-auto"}>
+      {/* The map presents one illustrated world at a time. */}
+      <main className={selectedLevel ? "flex-1 overflow-hidden" : "pt-20 pb-28 flex-1 overflow-hidden"}>
         {!selectedLevel ? (
-          <div className="max-w-4xl mx-auto px-4 py-8">
-            {[...levelPhases].reverse().map((phase, reversedIndex) => {
-              const originalIndex = levelPhases.length - 1 - reversedIndex;
-              const isUnlocked = unlockedPhases.includes(originalIndex);
-
-              const wrappedLevels = wrapLevelsWithStatus(
-                originalIndex,
-                phase,
-                completedLevels,
-                levelPhases
-              );
-
-              const currentPhaseId = getCurrentLevelId(phase);
-              const levelsPerPhase = phase.levels.length;
-              const containerHeight = (levelsPerPhase * 92) + 180;
-
-              return (
-                <div
-                  key={originalIndex}
-                  ref={(el) => (phaseRefs.current[originalIndex] = el)}
-                  className="relative mb-10"
-                >
-                  {/* Phase Title Banner */}
-                  <div className="sticky top-20 z-10 mb-5">
-                    <div className="phase-ribbon-3d py-2 px-4 text-center">
-                      <h2 className="text-white font-black text-base lg:text-xl drop-shadow-[0_2px_2px_rgba(120,53,15,0.8)]">
-                        📜 {phase.title}
-                      </h2>
-                    </div>
-                  </div>
-
-
-                  {/* Map Container */}
-                  <div className="relative w-full" style={{ minHeight: `${containerHeight}px` }}>
-                    {/* Hilly 3D Path SVG - layered shadow + gold + rim highlight */}
-                    <svg 
-                      className="absolute inset-0 w-full h-full pointer-events-none" 
-                      viewBox={`0 0 100 ${containerHeight}`}
-                      preserveAspectRatio="none"
-                      style={{ zIndex: 0 }}
-                    >
-                      <defs>
-                        <linearGradient id={`goldenPath-${originalIndex}`} x1="0%" y1="0%" x2="100%" y2="0%">
-                          <stop offset="0%" stopColor="#FFD93D" />
-                          <stop offset="50%" stopColor="#FFC107" />
-                          <stop offset="100%" stopColor="#FFD93D" />
-                        </linearGradient>
-                      </defs>
-                      {/* Hill lumps behind path */}
-                      {wrappedLevels.map((level) => (
-                        <ellipse
-                          key={`hill-${level.id}`}
-                          cx={level.position.x}
-                          cy={level.position.y + 10}
-                          rx="18"
-                          ry="22"
-                          fill="#8b5a2b"
-                          opacity="0.15"
-                        />
-                      ))}
-                      {wrappedLevels.map((level, idx) => {
-                        if (idx === 0) return null;
-                        const prevLevel = wrappedLevels[idx - 1];
-                        const x1 = prevLevel.position.x;
-                        const y1 = prevLevel.position.y;
-                        const x2 = level.position.x;
-                        const y2 = level.position.y;
-                        const midY = (y1 + y2) / 2;
-                        const d = `M ${x1} ${y1} C ${x1} ${midY - 14}, ${x2} ${midY + 14}, ${x2} ${y2}`;
-
-                        return (
-                          <g key={`path-${level.id}`}>
-                            {/* Ground shadow */}
-                            <path
-                              d={d}
-                              fill="none"
-                              stroke="#5b3a1a"
-                              strokeWidth="18"
-                              strokeLinecap="round"
-                              opacity="0.45"
-                              transform="translate(0,4)"
-                            />
-                            {/* Base golden road */}
-                            <path
-                              d={d}
-                              fill="none"
-                              stroke={`url(#goldenPath-${originalIndex})`}
-                              strokeWidth="14"
-                              strokeLinecap="round"
-                              opacity="0.95"
-                            />
-                            {/* Top rim highlight */}
-                            <path
-                              d={d}
-                              fill="none"
-                              stroke="#FFF3B0"
-                              strokeWidth="4"
-                              strokeLinecap="round"
-                              opacity="0.85"
-                              transform="translate(0,-2)"
-                            />
-                          </g>
-                        );
-                      })}
-                    </svg>
-
-                    {/* Level Nodes */}
-                    {wrappedLevels.map((level, idx) => {
-                      const isCompleted = completedLevels.includes(level.id);
-                      const isCurrentLevel = currentPhaseId === level.id;
-                      const isPreviousCompleted = idx === 0 || completedLevels.includes(wrappedLevels[idx - 1].id);
-                      const isLevelUnlocked = isUnlocked && isPreviousCompleted;
-                      const isPhaseEnd = idx === wrappedLevels.length - 1;
-                      const score = levelScores[level.id] || 0;
-                      const stars = getStarsFromScore(score);
-
-                      return (
-                        <div
-                          key={level.id}
-                          ref={(el) => (levelRefs.current[level.id] = el)}
-                          className="absolute"
-                          style={{
-                            left: `${level.position.x}%`,
-                            top: `${level.position.y}px`,
-                            transform: 'translate(-50%, -50%)',
-                            zIndex: 10,
-                          }}
-                        >
-                          {/* Avatar on Current Level */}
-                          {isCurrentLevel && (
-                            <div className="absolute -top-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5">
-                              <div className="text-3xl animate-bounce drop-shadow-lg">
-                                {getCurrentAvatar()}
-                              </div>
-                              <span className="bg-yellow-400 text-white font-black text-[9px] px-1.5 py-0.5 rounded-full shadow-lg">
-                                YOU
-                              </span>
-                            </div>
-                          )}
-
-                          {/* Level Node Button - Responsive with Light Bulb */}
-                          <button
-                            aria-label={`${isLevelUnlocked ? (isCompleted ? "Replay" : "Play") : "Locked"} phase ${level.phaseNumber}, level ${level.number}${isPhaseEnd ? ", phase treasure chest" : ""}; ${stars} of 3 stars`}
-                            onClick={() => {
-                              if (gameUser.lives === 0) {
-                                playSound("error", effectsOn);
-                                setShowNoLivesModal(true);
-                                return;
-                              }
-                              if (isLevelUnlocked) {
-                                playSound("optionSelect", effectsOn);
-                                startLevel(level);
-                              } else {
-                                playSound("error", effectsOn);
-                                handleLockedClick(level.id);
-                              }
-                            }}
-                            disabled={!isLevelUnlocked}
-                            className={`
-                              level-node-3d sm
-                              w-11 h-11 sm:w-14 sm:h-14 lg:w-16 lg:h-16
-                              flex items-center justify-center
-                              ${!isLevelUnlocked ? 'is-locked' : ''}
-                              ${isCompleted ? 'is-completed' : ''}
-                              ${isCurrentLevel ? 'is-current glow-ring ring-4 ring-yellow-300/80' : ''}
-                              ${shakingLevel === level.id ? 'animate-wiggle' : ''}
-                            `}
-                          >
-                            <span className="text-base sm:text-xl lg:text-2xl leading-none font-black text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.65)]">
-                              {level.number}
-                            </span>
-                            {!isLevelUnlocked && (
-                              <span className="absolute -top-1 -left-1 flex h-4 w-4 items-center justify-center rounded-full border border-white/80 bg-gray-700 shadow-md sm:h-5 sm:w-5">
-                                <Lock className="h-2.5 w-2.5 text-white sm:h-3 sm:w-3" />
-                              </span>
-                            )}
-                          </button>
-
-
-                          {isPhaseEnd && (
-                            <span
-                              aria-hidden="true"
-                              className="btn-orb btn-orb-yellow absolute -right-2 -top-2 z-20 h-6 w-6 border-2"
-                            >
-                              <svg
-                                className="h-3.5 w-3.5 text-amber-950 drop-shadow-sm"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2.2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <path d="M4 10h16v9a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z" />
-                                <path d="m4 10 2-5h12l2 5M3 10h18M12 5v5m-2 4h4" />
-                              </svg>
-                            </span>
-                          )}
-
-                          {/* Star slots show earned progress and open goals. */}
-                          <div
-                            aria-hidden="true"
-                            className="absolute -bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-white/30 bg-black/40 px-1 py-0.5 shadow-sm"
-                          >
-                            {[...Array(3)].map((_, starIdx) => (
-                              <Star
-                                key={starIdx}
-                                className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${
-                                  starIdx < stars
-                                    ? 'text-yellow-400 fill-yellow-400'
-                                    : 'text-gray-300 fill-none'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <ThemedWorldMap
+            phase={levelPhases[selectedPhaseIndex] || levelPhases[0]}
+            phaseIndex={selectedPhaseIndex}
+            totalPhases={levelPhases.length}
+            completedLevels={completedLevels}
+            levelScores={levelScores}
+            isPhaseUnlocked={unlockedPhases.includes(selectedPhaseIndex)}
+            currentLevelId={getCurrentLevelId(levelPhases[selectedPhaseIndex] || levelPhases[0])}
+            currentAvatar={getCurrentAvatar()}
+            totalCompleted={completedLevels.length}
+            totalLevels={levelPhases.reduce((total, phase) => total + phase.levels.length, 0)}
+            levelRefs={levelRefs}
+            shakingLevel={shakingLevel}
+            onLockedClick={(levelId) => {
+              playSound("error", effectsOn);
+              handleLockedClick(levelId);
+            }}
+            onPlayLevel={(level) => {
+              if (gameUser.lives === 0) {
+                playSound("error", effectsOn);
+                setShowNoLivesModal(true);
+                return;
+              }
+              playSound("optionSelect", effectsOn);
+              startLevel(level);
+            }}
+            onPreviousPhase={() => changeMapPhase(selectedPhaseIndex - 1)}
+            onNextPhase={() => changeMapPhase(selectedPhaseIndex + 1)}
+          />
         ) : (
           <GameScreen
             level={selectedLevel}
