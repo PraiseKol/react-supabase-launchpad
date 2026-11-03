@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import orchardWorld from "@/assets/world-orchard.jpg";
 import desertWorld from "@/assets/world-desert.jpg";
 import coastWorld from "@/assets/world-coast.jpg";
-import { getStarsFromScore, wrapLevelsWithStatus } from "@/utils/gameHelpers";
+import { getStarsFromScore } from "@/utils/gameHelpers";
 
 const worlds = [
   { image: orchardWorld, name: "Olive Grove" },
@@ -13,16 +13,16 @@ const worlds = [
 ];
 
 const nodePositions = [
-  { x: 28, y: 86 },
-  { x: 40, y: 76 },
-  { x: 61, y: 68 },
-  { x: 73, y: 59 },
-  { x: 65, y: 50 },
-  { x: 48, y: 42 },
-  { x: 33, y: 34 },
-  { x: 28, y: 25 },
-  { x: 43, y: 17 },
-  { x: 62, y: 9 },
+  { x: 30, y: 80 },
+  { x: 70, y: 80 },
+  { x: 70, y: 65 },
+  { x: 30, y: 65 },
+  { x: 30, y: 50 },
+  { x: 70, y: 50 },
+  { x: 70, y: 35 },
+  { x: 30, y: 35 },
+  { x: 30, y: 20 },
+  { x: 70, y: 20 },
 ];
 
 export default function ThemedWorldMap({
@@ -98,6 +98,9 @@ export default function ThemedWorldMap({
           <p className="mt-1 text-[11px] font-semibold text-world-cream/90 sm:text-xs">
             Phase {phase.phaseNumber} of {totalPhases} · {phaseCompleted}/{wrappedLevels.length} levels complete
           </p>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-world-cream/30">
+            <div className="h-full rounded-full bg-world-gold transition-[width] duration-500" style={{ width: `${phaseProgress}%` }} />
+          </div>
         </div>
         <div className="min-w-16 rounded-lg border border-world-cream/50 bg-world-ink/80 px-2 py-2 text-center text-world-cream shadow-lg backdrop-blur-sm sm:min-w-20 sm:px-3">
           <span className="block text-[10px] font-bold uppercase text-world-gold sm:text-xs">Journey</span>
@@ -141,7 +144,7 @@ export default function ThemedWorldMap({
               type="button"
               aria-label={`${isUnlocked ? (isCompleted ? "Replay" : "Play") : "Locked"} phase ${phase.phaseNumber}, level ${level.number}${index === wrappedLevels.length - 1 ? ", phase reward chest" : ""}; ${stars} of 3 stars`}
               onClick={() => isUnlocked ? onPlayLevel(level) : onLockedClick(level.id)}
-              className={`level-node-3d sm relative h-11 w-11 rounded-full border-2 border-world-cream p-0 text-base font-black text-white shadow-lg sm:h-14 sm:w-14 sm:text-xl ${!isUnlocked ? "is-locked" : ""} ${isCompleted ? "is-completed" : ""} ${isCurrent ? "is-current glow-ring ring-4 ring-world-gold/80" : ""} ${shakingLevel === level.id ? "animate-wiggle" : ""}`}
+              className={`level-node-3d sm relative h-11 w-11 rounded-full border-2 border-world-cream p-0 text-base font-black text-world-cream shadow-lg sm:h-14 sm:w-14 sm:text-xl ${!isUnlocked ? "is-locked" : ""} ${isCompleted ? "is-completed" : ""} ${isCurrent ? "is-current glow-ring ring-4 ring-world-gold/80" : ""} ${shakingLevel === level.id ? "animate-wiggle" : ""}`}
             >
               {level.number}
               {!isUnlocked && <Lock className="absolute -left-1 -top-1 h-4 w-4 rounded-full border border-white bg-world-ink p-0.5 text-world-cream sm:h-5 sm:w-5" />}
@@ -161,37 +164,24 @@ export default function ThemedWorldMap({
       <Button
         type="button"
         variant="outline"
-        size="icon"
         onClick={onPreviousPhase}
         disabled={phaseIndex === 0}
         aria-label="Previous world"
-        className="absolute left-2 top-1/2 z-20 h-11 w-11 -translate-y-1/2 rounded-full border-2 border-world-cream bg-world-ink/85 text-world-cream shadow-lg hover:bg-world-ink disabled:opacity-40 sm:left-5 sm:h-14 sm:w-14"
+        className="absolute left-2 top-1/2 z-20 h-11 w-11 -translate-y-1/2 rounded-full border-2 border-world-cream bg-world-ink/85 p-0 text-world-cream shadow-lg hover:bg-world-ink disabled:opacity-40 sm:left-5 sm:h-14 sm:w-14"
       >
         <ArrowLeft className="h-5 w-5 sm:h-6 sm:w-6" />
       </Button>
       <Button
         type="button"
         variant="outline"
-        size="icon"
         onClick={onNextPhase}
         disabled={phaseIndex === totalPhases - 1}
         aria-label="Next world"
-        className="absolute right-2 top-1/2 z-20 h-11 w-11 -translate-y-1/2 rounded-full border-2 border-world-cream bg-world-ink/85 text-world-cream shadow-lg hover:bg-world-ink disabled:opacity-40 sm:right-5 sm:h-14 sm:w-14"
+        className="absolute right-2 top-1/2 z-20 h-11 w-11 -translate-y-1/2 rounded-full border-2 border-world-cream bg-world-ink/85 p-0 text-world-cream shadow-lg hover:bg-world-ink disabled:opacity-40 sm:right-5 sm:h-14 sm:w-14"
       >
         <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6" />
       </Button>
 
-      <footer className="absolute inset-x-3 bottom-3 z-20 sm:inset-x-6 sm:bottom-5">
-        <div className="ml-auto max-w-64 rounded-full border border-world-cream/60 bg-world-ink/80 px-3 py-2 text-world-cream shadow-lg backdrop-blur-sm sm:max-w-80">
-          <div className="mb-1 flex items-center justify-between gap-2 text-[10px] font-bold sm:text-xs">
-            <span>World progress</span>
-            <span>{phaseProgress}%</span>
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-world-cream/30">
-            <div className="h-full rounded-full bg-world-gold transition-[width] duration-500" style={{ width: `${phaseProgress}%` }} />
-          </div>
-        </div>
-      </footer>
     </section>
   );
 }

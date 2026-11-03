@@ -456,6 +456,7 @@
 @layer components {
   .world-map-scene {
     isolation: isolate;
+    touch-action: pan-y;
   }
 
   .world-map-scene::after {
