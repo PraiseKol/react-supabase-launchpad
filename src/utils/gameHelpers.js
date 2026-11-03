@@ -9,6 +9,14 @@ export const determineUnlockedPhases = (completedIds, levelPhases) => {
     }
     return unlocked;
   };
+
+export const getCurrentPhaseIndex = (completedIds, levelPhases, unlockedIndices = [0]) => {
+  const firstIncompletePhase = levelPhases.findIndex((phase) =>
+    phase.levels.some((level) => !completedIds.includes(level.id))
+  );
+  if (firstIncompletePhase !== -1) return firstIncompletePhase;
+  return Math.max(...(unlockedIndices.length > 0 ? unlockedIndices : [0]));
+};
   
   export const wrapLevelsWithStatus = (phaseIndex, phase, completedIds, levelPhases) =>
     phase.levels.map((level, index) => ({
