@@ -13,16 +13,16 @@ const worlds = [
 ];
 
 const nodePositions = [
-  { x: 28, y: 86 },
-  { x: 40, y: 76 },
-  { x: 61, y: 68 },
-  { x: 73, y: 59 },
-  { x: 65, y: 50 },
-  { x: 48, y: 42 },
-  { x: 33, y: 34 },
-  { x: 28, y: 25 },
-  { x: 43, y: 17 },
-  { x: 62, y: 9 },
+  { x: 30, y: 80 },
+  { x: 70, y: 80 },
+  { x: 70, y: 65 },
+  { x: 30, y: 65 },
+  { x: 30, y: 50 },
+  { x: 70, y: 50 },
+  { x: 70, y: 35 },
+  { x: 30, y: 35 },
+  { x: 30, y: 20 },
+  { x: 70, y: 20 },
 ];
 
 export default function ThemedWorldMap({
@@ -98,6 +98,9 @@ export default function ThemedWorldMap({
           <p className="mt-1 text-[11px] font-semibold text-world-cream/90 sm:text-xs">
             Phase {phase.phaseNumber} of {totalPhases} · {phaseCompleted}/{wrappedLevels.length} levels complete
           </p>
+          <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-world-cream/30">
+            <div className="h-full rounded-full bg-world-gold transition-[width] duration-500" style={{ width: `${phaseProgress}%` }} />
+          </div>
         </div>
         <div className="min-w-16 rounded-lg border border-world-cream/50 bg-world-ink/80 px-2 py-2 text-center text-world-cream shadow-lg backdrop-blur-sm sm:min-w-20 sm:px-3">
           <span className="block text-[10px] font-bold uppercase text-world-gold sm:text-xs">Journey</span>
@@ -179,17 +182,6 @@ export default function ThemedWorldMap({
         <ArrowRight className="h-5 w-5 sm:h-6 sm:w-6" />
       </Button>
 
-      <footer className="absolute inset-x-3 bottom-3 z-20 sm:inset-x-6 sm:bottom-5">
-        <div className="ml-auto max-w-64 rounded-full border border-world-cream/60 bg-world-ink/80 px-3 py-2 text-world-cream shadow-lg backdrop-blur-sm sm:max-w-80">
-          <div className="mb-1 flex items-center justify-between gap-2 text-[10px] font-bold sm:text-xs">
-            <span>World progress</span>
-            <span>{phaseProgress}%</span>
-          </div>
-          <div className="h-2 overflow-hidden rounded-full bg-world-cream/30">
-            <div className="h-full rounded-full bg-world-gold transition-[width] duration-500" style={{ width: `${phaseProgress}%` }} />
-          </div>
-        </div>
-      </footer>
     </section>
   );
 }

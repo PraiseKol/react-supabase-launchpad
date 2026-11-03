@@ -324,7 +324,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
     if (!selectedLevel && completedLevels !== undefined && !progressLoading) {
       setSelectedPhaseIndex(getCurrentPhaseIndex(completedLevels, levelPhases, unlockedPhases));
     }
-  }, [completedLevels, progressLoading, selectedLevel, levelPhases, unlockedPhases]);
+  }, [completedLevels, progressLoading, levelPhases, unlockedPhases]);
 
   useEffect(() => {
     if (showNextLevelModal) {
