@@ -38,6 +38,7 @@ import { updateQuestProgress } from "@/lib/quests";
 import { checkAndGrantAchievements } from "@/lib/achievements";
 import {
   determineUnlockedPhases,
+  getCurrentPhaseIndex,
   getStarsFromScore,
   getPowerUpIcon,
   getPowerUpTooltip,
@@ -322,11 +323,7 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
   // Open the world containing the player's next incomplete level.
   useEffect(() => {
     if (!selectedLevel && completedLevels !== undefined && !progressLoading) {
-      const firstIncompletePhaseIndex = levelPhases.findIndex((phase) =>
-        phase.levels.some((level) => !completedLevels.includes(level.id))
-      );
-      const lastUnlockedIndex = Math.max(...(unlockedPhases.length > 0 ? unlockedPhases : [0]));
-      setSelectedPhaseIndex(firstIncompletePhaseIndex === -1 ? lastUnlockedIndex : firstIncompletePhaseIndex);
+      setSelectedPhaseIndex(getCurrentPhaseIndex(completedLevels, levelPhases, unlockedPhases));
     }
   }, [completedLevels, progressLoading, selectedLevel, levelPhases, unlockedPhases]);
 
@@ -777,7 +774,9 @@ export default function MapAndGame({ sound, setSound, effectsOn }) {
             completedLevels={completedLevels}
             levelScores={levelScores}
             isPhaseUnlocked={unlockedPhases.includes(selectedPhaseIndex)}
-            currentLevelId={getCurrentLevelId(levelPhases[selectedPhaseIndex] || levelPhases[0])}
+            currentLevelId={selectedPhaseIndex === getCurrentPhaseIndex(completedLevels, levelPhases, unlockedPhases)
+              ? getCurrentLevelId(levelPhases[selectedPhaseIndex] || levelPhases[0])
+              : null}
             currentAvatar={getCurrentAvatar()}
             totalCompleted={completedLevels.length}
             totalLevels={levelPhases.reduce((total, phase) => total + phase.levels.length, 0)}
