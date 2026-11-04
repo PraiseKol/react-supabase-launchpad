@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import orchardWorld from "@/assets/world-orchard.jpg";
 import desertWorld from "@/assets/world-desert.jpg";
 import coastWorld from "@/assets/world-coast.jpg";
-import { getStarsFromScore } from "@/utils/gameHelpers";
+import { getAdjacentPhaseIndex, getStarsFromScore } from "@/utils/gameHelpers";
 
 const worlds = [
   { image: orchardWorld, name: "Olive Grove" },
@@ -52,6 +52,7 @@ export default function ThemedWorldMap({
     phaseNumber: phase.phaseNumber,
   }));
   const phaseCompleted = wrappedLevels.filter((level) => completedLevels.includes(level.id)).length;
+  const hasEarnedPhaseReward = wrappedLevels.length > 0 && phaseCompleted === wrappedLevels.length;
   const phaseProgress = Math.round((phaseCompleted / Math.max(wrappedLevels.length, 1)) * 100);
   const overallProgress = Math.round((totalCompleted / Math.max(totalLevels, 1)) * 100);
   const routePoints = wrappedLevels.map((_, index) => nodePositions[index] || { x: 50, y: 10 });
@@ -62,6 +63,8 @@ export default function ThemedWorldMap({
     const delta = event.clientX - swipeStartX.current;
     swipeStartX.current = null;
     if (Math.abs(delta) < 55) return;
+    const nextIndex = getAdjacentPhaseIndex(phaseIndex, delta < 0 ? 1 : -1, totalPhases);
+    if (nextIndex === null) return;
     if (delta < 0) onNextPhase();
     else onPreviousPhase();
   };
@@ -142,14 +145,22 @@ export default function ThemedWorldMap({
             )}
             <Button
               type="button"
-              aria-label={`${isUnlocked ? (isCompleted ? "Replay" : "Play") : "Locked"} phase ${phase.phaseNumber}, level ${level.number}${index === wrappedLevels.length - 1 ? ", phase reward chest" : ""}; ${stars} of 3 stars`}
+              aria-label={`${isUnlocked ? (isCompleted ? "Replay" : "Play") : "Locked"} phase ${phase.phaseNumber}, level ${level.number}${index === wrappedLevels.length - 1 ? `, phase reward chest${hasEarnedPhaseReward ? " earned" : " locked"}` : ""}; ${stars} of 3 stars`}
               onClick={() => isUnlocked ? onPlayLevel(level) : onLockedClick(level.id)}
               className={`level-node-3d sm relative h-11 w-11 rounded-full border-2 border-world-cream p-0 text-base font-black text-world-cream shadow-lg sm:h-14 sm:w-14 sm:text-xl ${!isUnlocked ? "is-locked" : ""} ${isCompleted ? "is-completed" : ""} ${isCurrent ? "is-current glow-ring ring-4 ring-world-gold/80" : ""} ${shakingLevel === level.id ? "animate-wiggle" : ""}`}
             >
               {level.number}
               {!isUnlocked && <Lock className="absolute -left-1 -top-1 h-4 w-4 rounded-full border border-white bg-world-ink p-0.5 text-world-cream sm:h-5 sm:w-5" />}
               {index === wrappedLevels.length - 1 && (
-                <span aria-hidden="true" className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-world-cream bg-world-gold text-sm shadow-md">🎁</span>
+                <span
+                  role="img"
+                  aria-label={hasEarnedPhaseReward ? "Phase reward chest earned" : "Phase reward chest locked"}
+                  title={hasEarnedPhaseReward ? "Phase reward earned" : "Complete this phase to earn its reward"}
+                  className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-world-cream bg-world-gold text-sm shadow-md"
+                >
+                  🎁
+                  {!hasEarnedPhaseReward && <Lock className="absolute -right-1 -top-1 h-3 w-3 rounded-full border border-world-cream bg-world-ink p-0.5 text-world-cream" aria-hidden="true" />}
+                </span>
               )}
             </Button>
             <span className="mt-1 flex items-center gap-0.5 rounded-full border border-world-cream/50 bg-world-ink/80 px-1.5 py-0.5 shadow-sm" aria-label={`${stars} of 3 stars`}>

@@ -17,6 +17,12 @@ export const getCurrentPhaseIndex = (completedIds, levelPhases, unlockedIndices 
   if (firstIncompletePhase !== -1) return firstIncompletePhase;
   return Math.max(...(unlockedIndices.length > 0 ? unlockedIndices : [0]));
 };
+
+export const getAdjacentPhaseIndex = (currentIndex, direction, totalPhases) => {
+  if (currentIndex < 0 || currentIndex >= totalPhases) return null;
+  const nextIndex = currentIndex + direction;
+  return nextIndex >= 0 && nextIndex < totalPhases ? nextIndex : null;
+};
   
   export const wrapLevelsWithStatus = (phaseIndex, phase, completedIds, levelPhases) =>
     phase.levels.map((level, index) => ({
