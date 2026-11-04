@@ -1,4 +1,4 @@
-import { getCurrentPhaseIndex, getStarsFromScore } from "./gameHelpers";
+import { getAdjacentPhaseIndex, getCurrentPhaseIndex, getStarsFromScore } from "./gameHelpers";
 
 test("a score of 50 earns one star", () => {
   expect(getStarsFromScore(50)).toBe(1);
@@ -27,4 +27,14 @@ test("the map opens the world containing the first incomplete level", () => {
 
 test("the map returns to the highest unlocked world after all levels are complete", () => {
   expect(getCurrentPhaseIndex(["P1-L1", "P1-L2", "P2-L1", "P2-L2"], samplePhases, [0, 1])).toBe(1);
+});
+
+test("world paging does not move before the first phase or beyond the last", () => {
+  expect(getAdjacentPhaseIndex(0, -1, 2)).toBeNull();
+  expect(getAdjacentPhaseIndex(1, 1, 2)).toBeNull();
+});
+
+test("world paging moves to an adjacent phase within bounds", () => {
+  expect(getAdjacentPhaseIndex(0, 1, 2)).toBe(1);
+  expect(getAdjacentPhaseIndex(1, -1, 2)).toBe(0);
 });
