@@ -110,10 +110,11 @@ export default function SettingsModal({
     }
   };
 
-  const handleAdminLogin = () => {
+    const handleAdminDashboard = () => {
     onClose();
-    navigate("/admin/login");
+    navigate("/admin/dashboard");
   };
+
 
   if (!isOpen) return null;
 
@@ -312,21 +313,22 @@ export default function SettingsModal({
             </Button>
           </div>
 
-          {/* Admin Login */}
+                    {/* Admin Dashboard */}
           {gameUser?.is_admin && (
             <div className="border-t border-gray-200 pt-3 sm:pt-4">
               <Button
                 onClick={() => {
                   playSound("click", effectsOn);
-                  handleAdminLogin();
+                  handleAdminDashboard();
                 }}
                 variant="secondary"
                 className="w-full bg-purple-600 text-white hover:bg-purple-500 rounded-lg shadow-md text-xs sm:text-sm"
               >
-                🛡 Admin Login
+                🛡 Admin Dashboard
               </Button>
             </div>
           )}
+
         </div>
 
         {/* Footer Buttons - Fixed at bottom */}
